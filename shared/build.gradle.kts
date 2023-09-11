@@ -27,6 +27,9 @@ kotlin {
         }
     }
     jvm("desktop")
+    js(IR) {
+        browser()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -66,6 +69,13 @@ kotlin {
                 implementation("io.ktor:ktor-client-apache:" + extra["ktor.version"])
                 implementation("app.cash.sqldelight:sqlite-driver:" + extra["sqlDelight.version"])
                 implementation("ch.qos.logback:logback-classic:1.4.7")
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("copy-webpack-plugin", "^9.1.0"))
+                implementation("io.ktor:ktor-client-js:" + extra["ktor.version"])
+                implementation("com.squareup.sqldelight:sqljs-driver:" + extra["sqlDelight.version"])
             }
         }
         val desktopTest by getting

@@ -64,15 +64,8 @@ class StateManager(repo: Repository) {
         screenInitSettings: ScreenInitSettings,
         firstInit: Boolean = false
     ): Job? {
-        return if (!firstInit && screenInitSettings.callOnInitAtEachNavigation == CallOnInitValues.CALL_BEFORE_SHOWING_SCREEN) {
-            runBlocking {
-                screenInitSettings.callOnInit(this@StateManager)
-            }
-            null
-        } else {
-            runInScreenScope(screenIdentifier) {
-                screenInitSettings.callOnInit(this@StateManager)
-            }
+        runInScreenScope(screenIdentifier) {
+            screenInitSettings.callOnInit(this@StateManager)
         }
     }
 

@@ -23,13 +23,16 @@ kotlin {
             kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
         }
     }
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":shared"))
                 api(compose.foundation)
                 api(compose.ui)
-                api(compose.uiTooling)
                 api(compose.material)
                 api(compose.materialIconsExtended)
                 api(compose.runtime)
@@ -61,4 +64,8 @@ android {
             isMinifyEnabled = true
         }
     }
+}
+
+compose.experimental {
+    web.application {}
 }
