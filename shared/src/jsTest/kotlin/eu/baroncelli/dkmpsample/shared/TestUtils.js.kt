@@ -13,5 +13,5 @@ actual suspend fun getTestRepository(): Repository {
         )
     )
     LocalDb.Schema.create(sqlDriver).await()
-    return Repository(sqlDriver, MapSettings(), false)
+    return Repository(sqlDriver, MapSettings())
 }

@@ -8,5 +8,5 @@ import mylocal.db.LocalDb
 
 actual suspend fun getTestRepository(): Repository {
     val sqlDriver = NativeSqliteDriver(LocalDb.Schema.synchronous(), "test.db")
-    return Repository(sqlDriver, MapSettings(), false)
+    return Repository(sqlDriver, MapSettings())
 }
