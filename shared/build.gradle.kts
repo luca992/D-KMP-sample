@@ -74,8 +74,10 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm("copy-webpack-plugin", "^9.1.0"))
+                implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.0.0"))
+                implementation(npm("sql.js", "1.8.0"))
+                implementation("app.cash.sqldelight:web-worker-driver:" + extra["sqlDelight.version"])
                 implementation("io.ktor:ktor-client-js:" + extra["ktor.version"])
-                implementation("com.squareup.sqldelight:sqljs-driver:" + extra["sqlDelight.version"])
             }
         }
         val desktopTest by getting
@@ -129,6 +131,7 @@ sqldelight {
         create("LocalDb") {
             packageName.set("mylocal.db")
             srcDirs("src/commonMain/kotlin")
+            generateAsync.set(true)
         }
     }
 }

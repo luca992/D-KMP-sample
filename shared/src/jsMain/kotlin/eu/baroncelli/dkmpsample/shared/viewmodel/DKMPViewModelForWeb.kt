@@ -1,14 +1,19 @@
 package eu.baroncelli.dkmpsample.shared.viewmodel
 
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.drivers.sqljs.initSqlDriver
+
+import app.cash.sqldelight.driver.worker.WebWorkerDriver
 import eu.baroncelli.dkmpsample.shared.datalayer.Repository
-import kotlinx.coroutines.await
 import mylocal.db.LocalDb
+import org.w3c.dom.Worker
 
 
 suspend fun DKMPViewModel.Factory.getWebInstance(): DKMPViewModel {
-    val sqlDriver: SqlDriver = initSqlDriver(LocalDb.Schema).await()
+    val sqlDriver = WebWorkerDriver(
+        Worker(
+            js("""new URL("@cashapp/sqldelight-sqljs-worker/sqljs.worker.js", import.meta.url)""")
+        )
+    )
+    LocalDb.Schema.create(sqlDriver).await()
     val repository = Repository(sqlDriver)
     return DKMPViewModel(repository)
 }
