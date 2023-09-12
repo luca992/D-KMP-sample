@@ -64,7 +64,7 @@ class StateManager(repo: Repository) {
         screenInitSettings: ScreenInitSettings,
         firstInit: Boolean = false
     ): Job? {
-        runInScreenScope(screenIdentifier) {
+        return runInScreenScope(screenIdentifier) {
             screenInitSettings.callOnInit(this@StateManager)
         }
     }
