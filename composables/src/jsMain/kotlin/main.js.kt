@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLCanvasElement
 fun main() = application { model ->
     onWasmReady {
         maxResizeCanvase()
-        BrowserViewportWindow("eqoty") {
+        BrowserViewportWindow("D-KMP Sample") {
             MyMaterialTheme {
                 MainComposable(model)
             }
