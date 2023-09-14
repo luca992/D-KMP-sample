@@ -33,10 +33,10 @@ class ApiClient {
             // please notice, Ktor Client is switching to a background thread under the hood
             // so the http call doesn't happen on the main thread, even if the coroutine has been launched on Dispatchers.Main
             val resp = client.get(url).body<T>()
-            debugLogger.log("$url API SUCCESS")
+            debugLogger.i("$url API SUCCESS")
             return resp
         } catch (e: Exception) {
-            debugLogger.log("$url API FAILED: " + e.message)
+            debugLogger.i("$url API FAILED: "+e.message )
         }
         return null
     }

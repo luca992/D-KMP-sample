@@ -38,6 +38,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:" + extra["ktor.version"])
                 implementation("io.ktor:ktor-serialization-kotlinx-json:" + extra["ktor.version"])
                 implementation("com.russhwolf:multiplatform-settings-no-arg:" + extra["multiplatformSettings.version"])
+                implementation("co.touchlab:kermit:2.0.0-RC5")
             }
         }
         val commonTest by getting {

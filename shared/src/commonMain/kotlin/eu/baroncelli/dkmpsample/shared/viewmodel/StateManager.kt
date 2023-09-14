@@ -37,7 +37,7 @@ class StateManager(repo: Repository) {
     // INIT SCREEN
 
     fun initScreen(screenIdentifier: ScreenIdentifier): Job? {
-        debugLogger.log("initScreen: " + screenIdentifier.URI)
+        debugLogger.i("initScreen: " + screenIdentifier.URI)
         val screenInitSettings = screenIdentifier.getScreenInitSettings(this)
         if (screenScopesMap[screenIdentifier.URI] == null || !screenScopesMap[screenIdentifier.URI]!!.isActive) {
             screenScopesMap[screenIdentifier.URI]?.cancel()
@@ -83,8 +83,8 @@ class StateManager(repo: Repository) {
         @Suppress("UNUSED_PARAMETER") stateClass: KClass<T>,
         update: (T) -> T,
     ) {
-        debugLogger.log("updateScreen: " + stateClass.simpleName)
-        //debugLogger.log("currentVerticalNavigationLevelsMap: "+currentVerticalNavigationLevelsMap.values.map { it.URI } )
+        debugLogger.i("updateScreen: " + stateClass.simpleName)
+        //debugLogger.i("currentVerticalNavigationLevelsMap: "+currentVerticalNavigationLevelsMap.values.map { it.URI } )
 
         lateinit var screenIdentifier: ScreenIdentifier
         var screenState: T?
@@ -93,7 +93,7 @@ class StateManager(repo: Repository) {
             if (screenState != null) {
                 screenIdentifier = currentVerticalNavigationLevelsMap[i]!!
                 screenStatesMap[screenIdentifier.URI]!!.value = update(screenState)
-                debugLogger.log("state updated @ /${screenIdentifier.URI}")
+                debugLogger.i("state updated @ /${screenIdentifier.URI}")
                 return
             }
         }
@@ -103,12 +103,12 @@ class StateManager(repo: Repository) {
     // REMOVE SCREEN
 
     fun removeScreen(screenIdentifier: ScreenIdentifier) {
-        debugLogger.log("removeScreen: " + screenIdentifier.URI + " / level " + screenIdentifier.screen.navigationLevel)
+        debugLogger.i("removeScreen: " + screenIdentifier.URI + " / level " + screenIdentifier.screen.navigationLevel)
         screenScopesMap[screenIdentifier.URI]?.cancel() // cancel screen's coroutine scope
         screenScopesMap.remove(screenIdentifier.URI)
         val screenInitSettings = screenIdentifier.getScreenInitSettings(this)
         if (screenInitSettings.clearStateCacheWhenScreenIsRemovedFromBackstack) {
-            debugLogger.log("removeState " + screenIdentifier.URI)
+            debugLogger.i("removeState " + screenIdentifier.URI)
             screenStatesMap.remove(screenIdentifier.URI)
         }
     }
@@ -118,7 +118,7 @@ class StateManager(repo: Repository) {
 
     fun reinitScreenScopes(): List<ScreenIdentifier> {
         currentVerticalNavigationLevelsMap.forEach {
-            //debugLogger.log("reinitScreenScopes() "+it.value.URI)
+            //debugLogger.i("reinitScreenScopes() "+it.value.URI)
             screenScopesMap[it.value.URI] = CoroutineScope(Job() + Dispatchers.Main)
         }
         return currentVerticalNavigationLevelsMap.values.toMutableList() // return list of screens whose scope has been reinitialized
@@ -135,7 +135,7 @@ class StateManager(repo: Repository) {
 
     fun cancelScreenScopes() {
         screenScopesMap.forEach {
-            //debugLogger.log("cancelScreenScopes() "+it.key)
+            //debugLogger.i("cancelScreenScopes() "+it.key)
             it.value.cancel() // cancel screen's coroutine scope
         }
     }
