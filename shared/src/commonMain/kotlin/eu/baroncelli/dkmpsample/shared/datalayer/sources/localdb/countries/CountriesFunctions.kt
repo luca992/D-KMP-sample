@@ -4,11 +4,11 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import eu.baroncelli.dkmpsample.shared.datalayer.objects.CountryListData
 import mylocal.db.LocalDb
 
-suspend fun LocalDb.getCountriesList() : List<CountryListData> {
+suspend fun LocalDb.getCountriesList(): List<CountryListData> {
     return countriesQueries.getCountriesList(mapper = ::CountryListData).awaitAsList()
 }
 
-suspend fun LocalDb.setCountriesList(list : List<CountryListData>) {
+suspend fun LocalDb.setCountriesList(list: List<CountryListData>) {
     countriesQueries.transaction {
         list.forEach {
             countriesQueries.upsertCountry(
@@ -21,10 +21,10 @@ suspend fun LocalDb.setCountriesList(list : List<CountryListData>) {
     }
 }
 
-suspend fun LocalDb.toggleFavoriteCountry(country : String) {
+suspend fun LocalDb.toggleFavoriteCountry(country: String) {
     countriesQueries.updateFavorite(country)
 }
 
-suspend fun LocalDb.getFavoriteCountriesMap() : Map<String,Boolean> {
-    return countriesQueries.getFavorites().awaitAsList().associateBy({it}, {true})
+suspend fun LocalDb.getFavoriteCountriesMap(): Map<String, Boolean> {
+    return countriesQueries.getFavorites().awaitAsList().associateBy({ it }, { true })
 }
