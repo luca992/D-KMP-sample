@@ -32,7 +32,7 @@ fun Navigation.ScreenPicker(
             CountriesListScreen(
                 countriesListState = state,
                 onListItemClick = { navigate(CountryDetail, CountryDetailParams(countryName = it)) },
-                onFavoriteIconClick = { events.selectFavorite(countryName = it) },
+                onFavoriteIconClick = { stateManager.events.selectFavorite(countryName = it) },
             )
         }
 

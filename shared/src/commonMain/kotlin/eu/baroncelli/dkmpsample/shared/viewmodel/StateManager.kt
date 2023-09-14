@@ -32,6 +32,8 @@ class StateManager(repo: Repository) {
         get() = verticalNavigationLevels[currentLevel1ScreenIdentifier?.URI] ?: mutableMapOf()
 
     internal val dataRepository by lazy { repo }
+    val events by lazy { Events(this) }
+
 
     // INIT SCREEN
 
