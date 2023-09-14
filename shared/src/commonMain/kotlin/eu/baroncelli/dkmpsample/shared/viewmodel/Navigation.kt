@@ -52,7 +52,16 @@ class Navigation(val stateManager: StateManager) {
     fun getStartScreenIdentifier(): ScreenIdentifier {
         var startScreenIdentifier = navigationSettings.homeScreen.screenIdentifier
         if (navigationSettings.saveLastLevel1Screen) {
-            startScreenIdentifier = ScreenIdentifier.getByURI(savedLevel1URI) ?: startScreenIdentifier
+            startScreenIdentifier = try {
+                ScreenIdentifier.getByURI(savedLevel1URI) ?: startScreenIdentifier
+            } catch (e: ScreenParamsDeserializationException) {
+                debugLogger.log(
+                    "Warning: Failed to deserialize params for screen: ${startScreenIdentifier.screen.asString}. " +
+                            "Retrying with default params for screen"
+                )
+                stateManager.dataRepository.localSettings.clear()
+                ScreenIdentifier.getByURI(savedLevel1URI)!!
+            }
         }
         return startScreenIdentifier
     }
