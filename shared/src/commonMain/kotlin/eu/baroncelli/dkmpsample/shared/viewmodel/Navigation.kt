@@ -3,6 +3,7 @@ package eu.baroncelli.dkmpsample.shared.viewmodel
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CallOnInitValues
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.navigationSettings
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.topbar.setTopBarTitleAndNavState
 import kotlinx.coroutines.Job
 
 data class NavigationState(
@@ -41,11 +42,6 @@ class Navigation(val stateManager: StateManager) {
     private fun saveLevel1URI(screenStack: ScreenStack, uri: URI) =
         stateManager.dataRepository.localSettings.setSavedScreenStackLevel1URI(screenStack, uri)
 
-    fun getTitle(screenIdentifier: ScreenIdentifier): String {
-        val screenInitSettings = screenIdentifier.getScreenInitSettings(stateManager)
-        return screenInitSettings.title
-    }
-
     fun getStartNavigationStates(): MutableMap<ScreenStack, NavigationState> {
         return ScreenStack.entries.associateWith { screenStack ->
             val screenIdentifier = getStartScreenIdentifier(screenStack)
@@ -82,11 +78,16 @@ class Navigation(val stateManager: StateManager) {
             paths = getPaths(screenStack),
             nextBackQuitsApp = nextBackQuitsApp
         )
+        val topScreenIdentifier = screenStackToNavigationState[screenStack]!!.topScreenIdentifier
         if (navigationSettings.saveLastLevel1Screen &&
-            screenStackToNavigationState[screenStack]!!.topScreenIdentifier.screen.navigationLevel == 1
+            topScreenIdentifier.screen.navigationLevel == 1
         ) {
-            saveLevel1URI(screenStack, screenStackToNavigationState[screenStack]!!.topScreenIdentifier.URI)
+            saveLevel1URI(screenStack, topScreenIdentifier.URI)
         }
+        stateManager.events.setTopBarTitleAndNavState(
+            topScreenIdentifier.getScreenInitSettings(stateManager).title,
+            topScreenIdentifier.screen.navigationLevel == 1
+        )
         debugLogger.log("UI NAVIGATION RECOMPOSITION: topScreenIdentifier URI -> " + screenStackToNavigationState[screenStack]!!.topScreenIdentifier.URI)
     }
 
