@@ -11,7 +11,7 @@ import eu.baroncelli.dkmpsample.composables.navigation.ScreenPicker
 import eu.baroncelli.dkmpsample.composables.navigation.TwoPaneDefaultDetail
 import eu.baroncelli.dkmpsample.composables.navigation.bars.Level1NavigationRail
 import eu.baroncelli.dkmpsample.composables.navigation.level1NavigationProcessor
-import eu.baroncelli.dkmpsample.composables.navigation.navigationProcessor
+import eu.baroncelli.dkmpsample.composables.navigation.onBackPressed
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
@@ -31,8 +31,10 @@ fun Navigation.TwoPane(
                 ScreenPicker(
                     ScreenStack.TopBar,
                     topBarStackScreenIdentifier,
-                    navigationProcessor(ScreenStack.TopBar, screenStackToLocalNavigationState)
-                )
+                    screenStackToLocalNavigationState
+                ) {
+                    onBackPressed(saveableStateHolder, screenStackToLocalNavigationState)
+                }
             }
         },
         content = {
@@ -55,7 +57,7 @@ fun Navigation.TwoPane(
                         ScreenPicker(
                             ScreenStack.Main,
                             masterScreenIdentifier,
-                            navigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
+                            screenStackToLocalNavigationState
                         )
                     }
                 }
@@ -71,7 +73,7 @@ fun Navigation.TwoPane(
                             ScreenPicker(
                                 ScreenStack.Main,
                                 detailScreenIdentifier,
-                                navigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
+                                screenStackToLocalNavigationState
                             )
                         }
                     }

@@ -12,3 +12,14 @@ expect fun Navigation.HandleBackButton(
     saveableStateHolder: SaveableStateHolder,
     localNavigationState: SnapshotStateMap<ScreenStack, NavigationState>,
 )
+
+fun Navigation.onBackPressed(
+    saveableStateHolder: SaveableStateHolder,
+    localNavigationState: SnapshotStateMap<ScreenStack, NavigationState>,
+) {
+    val navState = localNavigationState[ScreenStack.Main]!!
+    val originScreenIdentifier = navState.topScreenIdentifier
+    exitScreen(ScreenStack.Main, originScreenIdentifier) // shared navigationState is updated
+    localNavigationState[ScreenStack.Main] = screenStackToNavigationState[ScreenStack.Main]!! // update localNavigationState
+    saveableStateHolder.removeState(originScreenIdentifier)
+}

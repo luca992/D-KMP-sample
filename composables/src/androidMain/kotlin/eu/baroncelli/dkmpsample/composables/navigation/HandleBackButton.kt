@@ -14,10 +14,6 @@ actual fun Navigation.HandleBackButton(
     localNavigationState: SnapshotStateMap<ScreenStack, NavigationState>
 ) {
     BackHandler(!localNavigationState[ScreenStack.Main]!!.nextBackQuitsApp) { // catching the back button
-        val navState = localNavigationState[ScreenStack.Main]!!
-        val originScreenIdentifier = navState.topScreenIdentifier
-        exitScreen(ScreenStack.Main, originScreenIdentifier) // shared navigationState is updated
-        localNavigationState[ScreenStack.Main] = screenStackToNavigationState[ScreenStack.Main]!! // update localNavigationState
-        saveableStateHolder.removeState(originScreenIdentifier)
+        onBackPressed(saveableStateHolder, localNavigationState)
     }
 }

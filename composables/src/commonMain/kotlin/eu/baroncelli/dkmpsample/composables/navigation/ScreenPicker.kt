@@ -4,16 +4,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import eu.baroncelli.dkmpsample.composables.screens.countrieslist.CountriesListScreen
 import eu.baroncelli.dkmpsample.composables.screens.countrieslist.CountriesListTwoPaneDefaultDetail
 import eu.baroncelli.dkmpsample.composables.screens.countrydetail.CountryDetailScreen
 import eu.baroncelli.dkmpsample.composables.screens.topbar.TopBar
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
+import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
+import eu.baroncelli.dkmpsample.shared.viewmodel.debugLogger
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CountryDetailParams
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen.*
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenParams
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrieslist.CountriesListState
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrieslist.selectFavorite
@@ -25,18 +26,17 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.topbar.TopBarState
 fun Navigation.ScreenPicker(
     screenStack: ScreenStack,
     screenIdentifier: ScreenIdentifier,
-    navigate: (Screen, ScreenParams?) -> Unit
+    screenStackToLocalNavigationState: SnapshotStateMap<ScreenStack, NavigationState>,
+    onBackPressed: (() -> Unit)? = null
 ) {
-
+    val navigate = navigationProcessor(screenStack, screenStackToLocalNavigationState)
     when (screenIdentifier.screen) {
 
         TopBar -> {
             val state by stateProvider.get<TopBarState>(screenStack, screenIdentifier).collectAsState()
-            TopBar(state = state, onClickNavigateUp = {
-                val navState = screenStackToNavigationState[ScreenStack.Main]!!
-                val originScreenIdentifier = navState.topScreenIdentifier
-                exitScreen(ScreenStack.Main, originScreenIdentifier)
-            })
+            TopBar(
+                state = state,
+                onClickNavigateUp = onBackPressed ?: { debugLogger.log("No onBackPressed handler set") })
         }
 
         CountriesList -> {
