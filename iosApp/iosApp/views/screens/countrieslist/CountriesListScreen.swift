@@ -63,6 +63,7 @@ struct CountryListView_Previews: PreviewProvider {
         NavigationStack {
             CountriesListScreen(
                 observableScreenState: ObservableScreenState(
+                    screenStack: ScreenStack.main,
                     requestedSId: ScreenIdentifier.companion.get(
                         screen: Screen.countrieslist,
                         params: CountriesListParams.init(listType: CountriesListType.all)

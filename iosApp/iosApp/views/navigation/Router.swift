@@ -18,7 +18,9 @@ struct Router: View {
         let isIPad = UIDevice.current.userInterfaceIdiom == .pad
         
         let level1ScreenIdentifiers = getAllLevel1ScreenIdentifiers()
-        let level1ScreenIdentifiersWithState = appObj.dkmpNav.stateManager.verticalNavigationLevels.map{ ($0.value as! Dictionary<Int,ScreenIdentifier>)[1]! }
+        let level1ScreenIdentifiersWithState = appObj.dkmpNav.stateManager.screenStackToVerticalNavigationLevels[ScreenStack.main]!.map{
+            ($0.value as! Dictionary<Int,ScreenIdentifier>)[1]!
+        }
         
         
         if !isIPad {
@@ -26,7 +28,7 @@ struct Router: View {
                 ForEach(level1ScreenIdentifiers, id: \.self.URI) { screenIdentifier in
                     if ( level1ScreenIdentifiersWithState.contains{ $0.URI == screenIdentifier.URI } ) {
                         OnePane(level1ScreenIdentifier: screenIdentifier)
-                            .opacity(screenIdentifier.URI == appObj.dkmpNav.stateManager.currentLevel1ScreenIdentifier?.URI ? 1 : 0)
+                            .opacity(screenIdentifier.URI == appObj.dkmpNav.stateManager.currentLevel1ScreenIdentifier(screenStack: ScreenStack.main)?.URI ? 1 : 0)
                     } else {
                         EmptyView().opacity(0)
                     }
@@ -43,7 +45,7 @@ struct Router: View {
                 ForEach(level1ScreenIdentifiers, id: \.self.URI) { screenIdentifier in
                     if ( level1ScreenIdentifiersWithState.contains{ $0.URI == screenIdentifier.URI } ) {
                         TwoPane(level1ScreenIdentifier: screenIdentifier)
-                            .opacity(screenIdentifier.URI == appObj.dkmpNav.stateManager.currentLevel1ScreenIdentifier?.URI ? 1 : 0)
+                            .opacity(screenIdentifier.URI == appObj.dkmpNav.stateManager.currentLevel1ScreenIdentifier(screenStack: ScreenStack.main)?.URI ? 1 : 0)
                     } else {
                         EmptyView().opacity(0)
                     }
@@ -74,8 +76,8 @@ extension Navigation {
     }
 
     func navigateByLevel1Menu(_ appObj: AppObservableObject, level1Navigation: Level1Navigation) {
-        selectLevel1Navigation(level1ScreenIdentifier: level1Navigation.screenIdentifier) // shared navigationState is updated
-        appObj.localNavigationState = navigationState // update localNavigationState
+        selectLevel1Navigation(screenStack: ScreenStack.main, level1ScreenIdentifier: level1Navigation.screenIdentifier) // shared navigationState is updated
+        appObj.localNavigationState = screenStackToNavigationState[ScreenStack.main] as! NavigationState // update localNavigationState
     }
     
 }

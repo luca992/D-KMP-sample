@@ -19,7 +19,7 @@ extension Navigation {
                 CountriesListScreen(
                     observableScreenState: screenState,
                     onListItemClick: { name in self.navigate(.countrydetail, CountryDetailParams(countryName: name)) },
-                    onFavoriteIconClick: { name in self.events.selectFavorite(countryName: name) }
+                    onFavoriteIconClick: { name in self.stateManager.events.selectFavorite(countryName: name) }
                 )
                 
             case .countrydetail:
@@ -32,15 +32,15 @@ extension Navigation {
             }
             
         }
-        .navigationTitle(getTitle(screenIdentifier: screenState.requestedSId))
+        .navigationTitle(self.stateManager.currentScreenIdentifier(screenStack: ScreenStack.main).getScreenInitSettings(stateManager: self.stateManager).title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if screenState.requestedSId.URI == self.navigationState.topScreenIdentifier.URI {
+            if screenState.requestedSId.URI == (self.screenStackToNavigationState[ScreenStack.main]! as! NavigationState).topScreenIdentifier.URI {
                 NSLog("iOS side:  onAppear URI "+screenState.requestedSId.URI)
             }
         }
         .onDisappear {
-            self.exitScreenForIos(screenIdentifier: screenState.requestedSId)
+            self.exitScreenForIos(screenStack: ScreenStack.main, screenIdentifier: screenState.requestedSId)
         }
         .task {
             await screenState.collectScreenStateFlow()

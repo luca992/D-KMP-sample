@@ -20,12 +20,12 @@ class AppObservableObject: ObservableObject {
 
     init() {
         // "getDefaultAppState" and "onChange" are iOS-only DKMPViewModel's extension functions, defined in shared/iosMain
-        self.localNavigationState = model.navigation.navigationState
+        self.localNavigationState = model.navigation.screenStackToNavigationState[ScreenStack.main]! as! NavigationState
     }
 
     func getObservableScreenState(screenIdentifier: ScreenIdentifier) -> ObservableScreenState {
         if screenStates[screenIdentifier] == nil{
-            screenStates[screenIdentifier] = ObservableScreenState(requestedSId: screenIdentifier, stateProvider: dkmpNav.stateProvider)
+            screenStates[screenIdentifier] = ObservableScreenState(screenStack: ScreenStack.main, requestedSId: screenIdentifier, stateProvider: dkmpNav.stateProvider)
         }
         return screenStates[screenIdentifier]!
     }
