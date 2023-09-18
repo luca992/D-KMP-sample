@@ -36,7 +36,7 @@ fun Navigation.ScreenPicker(
             val state by stateProvider.get<TopBarState>(screenStack, screenIdentifier).collectAsState()
             TopBar(
                 state = state,
-                onClickNavigateUp = onBackPressed ?: { debugLogger.log("No onBackPressed handler set") })
+                onClickNavigateUp = onBackPressed ?: { debugLogger.i("No onBackPressed handler set") })
         }
 
         CountriesList -> {

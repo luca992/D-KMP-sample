@@ -69,7 +69,7 @@ class ScreenIdentifier private constructor(
                 val defaultParams = Level1Navigation.entries.first {
                     it.screenIdentifier.screen.asString == screen.asString
                 }.screenIdentifier.params
-                debugLogger.log(
+                debugLogger.i(
                     "Warning: Failed to cast params: $params as ${T::class} returning default L1 params for screen: " + "$defaultParams"
                 )
                 defaultParams as T

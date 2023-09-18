@@ -10,7 +10,7 @@ class Events(val stateManager: StateManager) {
 
     // we run each event function on a Dispatchers.Main coroutine
     fun screenCoroutine(screenStack: ScreenStack, block: suspend () -> Unit) {
-        debugLogger.log("/$screenStack:${stateManager.currentScreenIdentifier(screenStack).URI}: an Event is called")
+        debugLogger.i("/$screenStack:${stateManager.currentScreenIdentifier(screenStack).URI}: an Event is called")
         stateManager.runInScreenScope(screenStack) { block() }
     }
 

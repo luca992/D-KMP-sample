@@ -17,7 +17,7 @@ class StateProvider(val stateManager: StateManager) {
     }
 
     inline fun <reified T : ScreenState> getScreenState(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier): StateFlow<T> {
-        //debugLogger.log("getScreenState: "+screenIdentifier.URI)
+        //debugLogger.i("getScreenState: "+screenIdentifier.URI)
         return stateManager.screenStackToScreenStatesMap[screenStack]!![screenIdentifier.URI]!!.asStateFlow() as StateFlow<T>
     }
 

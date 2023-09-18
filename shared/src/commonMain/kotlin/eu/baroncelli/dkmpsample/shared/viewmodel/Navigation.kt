@@ -61,7 +61,7 @@ class Navigation(val stateManager: StateManager) {
             startScreenIdentifier = try {
                 ScreenIdentifier.getByURI(savedLevel1URI(screenStack)) ?: startScreenIdentifier
             } catch (e: ScreenParamsDeserializationException) {
-                debugLogger.log(
+                debugLogger.i(
                     "Warning: Failed to deserialize params for screen: ${startScreenIdentifier.screen.asString}. " +
                             "Retrying with default params for screen"
                 )
@@ -88,7 +88,7 @@ class Navigation(val stateManager: StateManager) {
             topScreenIdentifier.getScreenInitSettings(stateManager).title,
             topScreenIdentifier.screen.navigationLevel == 1
         )
-        debugLogger.log("UI NAVIGATION RECOMPOSITION: topScreenIdentifier URI -> " + screenStackToNavigationState[screenStack]!!.topScreenIdentifier.URI)
+        debugLogger.i("UI NAVIGATION RECOMPOSITION: topScreenIdentifier URI -> " + screenStackToNavigationState[screenStack]!!.topScreenIdentifier.URI)
     }
 
     fun getPaths(screenStack: ScreenStack): MutableMap<String, MutableList<ScreenIdentifier>> {
@@ -115,25 +115,25 @@ class Navigation(val stateManager: StateManager) {
         screenIdentifier: ScreenIdentifier,
         level1ScreenIdentifier: ScreenIdentifier
     ) {
-        //debugLogger.log("navigateToScreenForIos: "+screenIdentifier.URI+" / level1ScreenIdentifier: "+level1ScreenIdentifier.URI)
+        //debugLogger.i("navigateToScreenForIos: "+screenIdentifier.URI+" / level1ScreenIdentifier: "+level1ScreenIdentifier.URI)
         if (level1ScreenIdentifier.URI != stateManager.currentLevel1ScreenIdentifier(screenStack)?.URI ||
             stateManager.screenStackToCurrentVerticalBackstack[screenStack]!!.any { it.URI == screenIdentifier.URI }
         ) {
-            //debugLogger.log("navigateToScreenForIos: BLOCKED / shared side currentVerticalBackstack: "+stateManager.currentVerticalBackstack.map { it.URI })
+            //debugLogger.i("navigateToScreenForIos: BLOCKED / shared side currentVerticalBackstack: "+stateManager.currentVerticalBackstack.map { it.URI })
             return
         }
         navigateToScreen(screenStack, screenIdentifier)
     }
 
     fun navigateToScreen(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier) {
-        debugLogger.log("navigate -> " + screenIdentifier.URI)
+        debugLogger.i("navigate -> " + screenIdentifier.URI)
         addScreenToBackstack(screenStack, screenIdentifier)
         updateNavigationState(screenStack)
     }
 
 
     fun selectLevel1Navigation(screenStack: ScreenStack, level1ScreenIdentifier: ScreenIdentifier) {
-        debugLogger.log("selectLevel1Navigation -> " + level1ScreenIdentifier.URI)
+        debugLogger.i("selectLevel1Navigation -> " + level1ScreenIdentifier.URI)
         cleanCurrentVerticalBackstacks(screenStack)
         stateManager.screenStackToLevel1Backstack[screenStack]!!.removeAll { it.URI == level1ScreenIdentifier.URI }
         if (navigationSettings.alwaysQuitOnHomeScreen) {
@@ -184,7 +184,7 @@ class Navigation(val stateManager: StateManager) {
     // ADD SCREEN TO BACKSTACK
 
     fun addScreenToBackstack(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier): Job? {
-        debugLogger.log("addScreenToBackstack: " + screenIdentifier.URI)
+        debugLogger.i("addScreenToBackstack: " + screenIdentifier.URI)
         stateManager.screenStackToCurrentVerticalBackstack[screenStack]!!.add(screenIdentifier)
         stateManager.currentVerticalNavigationLevelsMap(screenStack)[screenIdentifier.screen.navigationLevel] =
             screenIdentifier
@@ -197,7 +197,7 @@ class Navigation(val stateManager: StateManager) {
     // this function is called from iOS, and it calls the proper "exitScreen"
     // only if the screenIdentifier to exit is valid
     fun exitScreenForIos(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier) {
-        //debugLogger.log("exitScreenForIos: " + screenIdentifier.URI)
+        //debugLogger.i("exitScreenForIos: " + screenIdentifier.URI)
         if (screenIdentifier.URI != stateManager.currentScreenIdentifier(screenStack).URI || nextBackQuitsApp) {
             return
         }
@@ -205,7 +205,7 @@ class Navigation(val stateManager: StateManager) {
     }
 
     fun exitScreen(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier) {
-        debugLogger.log("exitScreen: " + screenIdentifier.URI)
+        debugLogger.i("exitScreen: " + screenIdentifier.URI)
         if (screenIdentifier.screen.navigationLevel == 1) {
             stateManager.screenStackToLevel1Backstack[screenStack]!!.removeLast()
             stateManager.screenStackToVerticalNavigationLevels[screenStack]!!.remove(screenIdentifier.URI)
@@ -264,7 +264,7 @@ class Navigation(val stateManager: StateManager) {
 
     fun onReEnterForeground() {
         // not called at app startup, but only when reentering the app after it was in background
-        debugLogger.log("onReEnterForeground: recomposition is triggered")
+        debugLogger.i("onReEnterForeground: recomposition is triggered")
         val reinitializedScreens = stateManager.reinitScreenScopes()
         reinitializedScreens.flatMap { (screenStack, screenIds) ->
             screenIds.map { screenId ->
@@ -280,7 +280,7 @@ class Navigation(val stateManager: StateManager) {
     }
 
     fun onEnterBackground() {
-        debugLogger.log("onEnterBackground: screen scopes are cancelled")
+        debugLogger.i("onEnterBackground: screen scopes are cancelled")
         stateManager.cancelScreenScopes()
     }
 

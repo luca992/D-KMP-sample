@@ -17,12 +17,12 @@ suspend fun Repository.getCountriesListData(): List<CountriesListItem> = withRep
     //      FETCH CONDITION: database cache is over 1 hour old
     if (nowUnixtime - localSettings.listCacheTimestamp > 60 * 60) {
         webservices.fetchCountriesList()?.apply {
-            debugLogger.log("countriesList FETCHED FROM WEBSERVICES")
+            debugLogger.i("countriesList FETCHED FROM WEBSERVICES")
             if (error == null) {
                 localDb.setCountriesList(data.sortedByDescending { it.firstDosesPercentageFloat })
                 localSettings.listCacheTimestamp = nowUnixtime
             } else {
-                debugLogger.log("ERROR MESSAGE: $error")
+                debugLogger.i("ERROR MESSAGE: $error")
             }
         }
     }
