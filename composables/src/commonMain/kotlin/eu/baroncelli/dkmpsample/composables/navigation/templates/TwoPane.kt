@@ -3,30 +3,38 @@ package eu.baroncelli.dkmpsample.composables.navigation.templates
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.saveable.SaveableStateHolder
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import eu.baroncelli.dkmpsample.composables.navigation.ScreenPicker
 import eu.baroncelli.dkmpsample.composables.navigation.TwoPaneDefaultDetail
 import eu.baroncelli.dkmpsample.composables.navigation.bars.Level1NavigationRail
-import eu.baroncelli.dkmpsample.composables.navigation.bars.TopBar
 import eu.baroncelli.dkmpsample.composables.navigation.level1NavigationProcessor
 import eu.baroncelli.dkmpsample.composables.navigation.navigationProcessor
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 @Composable
 fun Navigation.TwoPane(
     saveableStateHolder: SaveableStateHolder,
-    localNavigationState: MutableState<NavigationState>
+    screenStackToLocalNavigationState: SnapshotStateMap<ScreenStack, NavigationState>
 ) {
-    val title = getTitle(localNavigationState.value.topScreenIdentifier)
-    val masterScreenIdentifier = twoPaneMasterScreen(localNavigationState)
-    val detailScreenIdentifier = twoPaneDetailScreen(localNavigationState)
+    val topBarStackScreenIdentifier = screenStackToLocalNavigationState[ScreenStack.TopBar]!!.topScreenIdentifier
+    val masterScreenIdentifier = twoPaneMasterScreen(screenStackToLocalNavigationState)
+    val detailScreenIdentifier = twoPaneDetailScreen(screenStackToLocalNavigationState)
     Scaffold(
-        topBar = { TopBar(title) },
+        topBar = {
+            saveableStateHolder.SaveableStateProvider(topBarStackScreenIdentifier.URI) {
+                ScreenPicker(
+                    ScreenStack.TopBar,
+                    topBarStackScreenIdentifier,
+                    navigationProcessor(ScreenStack.TopBar, screenStackToLocalNavigationState)
+                )
+            }
+        },
         content = {
             Row {
                 Column(
@@ -34,14 +42,21 @@ fun Navigation.TwoPane(
                         .fillMaxHeight()
                         .width(80.dp)
                 ) {
-                    Level1NavigationRail(masterScreenIdentifier, level1NavigationProcessor(localNavigationState))
+                    Level1NavigationRail(
+                        masterScreenIdentifier,
+                        level1NavigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
+                    )
                 }
                 Column(
                     Modifier
                         .weight(0.4f)
                 ) {
                     saveableStateHolder.SaveableStateProvider(masterScreenIdentifier.URI) {
-                        ScreenPicker(masterScreenIdentifier, navigationProcessor(localNavigationState))
+                        ScreenPicker(
+                            ScreenStack.Main,
+                            masterScreenIdentifier,
+                            navigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
+                        )
                     }
                 }
                 Column(
@@ -53,7 +68,11 @@ fun Navigation.TwoPane(
                         TwoPaneDefaultDetail(masterScreenIdentifier)
                     } else {
                         saveableStateHolder.SaveableStateProvider(detailScreenIdentifier.URI) {
-                            ScreenPicker(detailScreenIdentifier, navigationProcessor(localNavigationState))
+                            ScreenPicker(
+                                ScreenStack.Main,
+                                detailScreenIdentifier,
+                                navigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
+                            )
                         }
                     }
                 }
@@ -63,14 +82,14 @@ fun Navigation.TwoPane(
 }
 
 
-fun Navigation.twoPaneMasterScreen(navState: MutableState<NavigationState>): ScreenIdentifier {
-    return navState.value.currentLevel1ScreenIdentifier
+fun Navigation.twoPaneMasterScreen(navState: SnapshotStateMap<ScreenStack, NavigationState>): ScreenIdentifier {
+    return navState[ScreenStack.Main]!!.currentLevel1ScreenIdentifier
 }
 
-fun Navigation.twoPaneDetailScreen(navState: MutableState<NavigationState>): ScreenIdentifier? {
-    if (navState.value.topScreenIdentifier.screen.navigationLevel > 1) {
-        return navState.value.topScreenIdentifier
+fun Navigation.twoPaneDetailScreen(navState: SnapshotStateMap<ScreenStack, NavigationState>): ScreenIdentifier? {
+    return if (navState[ScreenStack.Main]!!.topScreenIdentifier.screen.navigationLevel > 1) {
+        navState[ScreenStack.Main]!!.topScreenIdentifier
     } else {
-        return null
+        null
     }
 }

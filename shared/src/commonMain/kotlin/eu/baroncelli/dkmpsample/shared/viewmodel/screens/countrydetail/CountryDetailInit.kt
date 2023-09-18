@@ -4,6 +4,7 @@ import eu.baroncelli.dkmpsample.shared.datalayer.functions.getCountryInfo
 import eu.baroncelli.dkmpsample.shared.viewmodel.StateManager
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CountryDetailParams
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenInitSettings
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 
 // INIZIALIZATION settings for this screen
@@ -15,7 +16,7 @@ fun StateManager.initCountryDetail(params: CountryDetailParams) = ScreenInitSett
     callOnInit = {
         val countryInfo = dataRepository.getCountryInfo(params.countryName)
         // update state, after retrieving data from the repository
-        updateScreen(CountryDetailState::class) {
+        updateScreen(ScreenStack.Main, CountryDetailState::class) {
             it.copy(
                 isLoading = false,
                 countryInfo = countryInfo,

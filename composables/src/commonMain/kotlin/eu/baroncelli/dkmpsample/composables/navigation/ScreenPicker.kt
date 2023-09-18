@@ -7,28 +7,40 @@ import androidx.compose.runtime.getValue
 import eu.baroncelli.dkmpsample.composables.screens.countrieslist.CountriesListScreen
 import eu.baroncelli.dkmpsample.composables.screens.countrieslist.CountriesListTwoPaneDefaultDetail
 import eu.baroncelli.dkmpsample.composables.screens.countrydetail.CountryDetailScreen
+import eu.baroncelli.dkmpsample.composables.screens.topbar.TopBar
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CountryDetailParams
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen.CountriesList
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen.CountryDetail
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen.*
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenParams
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrieslist.CountriesListState
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrieslist.selectFavorite
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrydetail.CountryDetailState
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.topbar.TopBarState
 
 
 @Composable
 fun Navigation.ScreenPicker(
+    screenStack: ScreenStack,
     screenIdentifier: ScreenIdentifier,
     navigate: (Screen, ScreenParams?) -> Unit
 ) {
 
     when (screenIdentifier.screen) {
 
+        TopBar -> {
+            val state by stateProvider.get<TopBarState>(screenStack, screenIdentifier).collectAsState()
+            TopBar(state = state, onClickNavigateUp = {
+                val navState = screenStackToNavigationState[ScreenStack.Main]!!
+                val originScreenIdentifier = navState.topScreenIdentifier
+                exitScreen(ScreenStack.Main, originScreenIdentifier)
+            })
+        }
+
         CountriesList -> {
-            val state by stateProvider.get<CountriesListState>(screenIdentifier).collectAsState()
+            val state by stateProvider.get<CountriesListState>(screenStack, screenIdentifier).collectAsState()
             CountriesListScreen(
                 countriesListState = state,
                 onListItemClick = { navigate(CountryDetail, CountryDetailParams(countryName = it)) },
@@ -37,7 +49,7 @@ fun Navigation.ScreenPicker(
         }
 
         CountryDetail -> {
-            val state by stateProvider.get<CountryDetailState>(screenIdentifier).collectAsState()
+            val state by stateProvider.get<CountryDetailState>(screenStack, screenIdentifier).collectAsState()
             CountryDetailScreen(
                 countryDetailState = state
             )

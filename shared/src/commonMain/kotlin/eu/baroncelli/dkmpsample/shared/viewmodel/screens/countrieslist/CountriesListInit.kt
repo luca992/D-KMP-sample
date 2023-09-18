@@ -6,6 +6,7 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.StateManager
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CallOnInitValues
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CountriesListParams
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenInitSettings
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 // INIZIALIZATION settings for this screen
 // this is what should be implemented:
@@ -24,7 +25,7 @@ fun StateManager.initCountriesList(params: CountriesListParams) = ScreenInitSett
             listData = listData.filter { favorites.containsKey(it.name) }
         }
         // update state, after retrieving data from the repository
-        updateScreen(CountriesListState::class) {
+        updateScreen(ScreenStack.Main, CountriesListState::class) {
             it.copy(
                 isLoading = false,
                 countriesListItems = listData,

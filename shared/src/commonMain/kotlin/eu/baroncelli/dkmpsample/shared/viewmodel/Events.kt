@@ -1,5 +1,7 @@
 package eu.baroncelli.dkmpsample.shared.viewmodel
 
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
+
 
 class Events(val stateManager: StateManager) {
 
@@ -7,9 +9,9 @@ class Events(val stateManager: StateManager) {
         get() = stateManager.dataRepository
 
     // we run each event function on a Dispatchers.Main coroutine
-    fun screenCoroutine(block: suspend () -> Unit) {
-        debugLogger.log("/" + stateManager.currentScreenIdentifier.URI + ": an Event is called")
-        stateManager.runInScreenScope { block() }
+    fun screenCoroutine(screenStack: ScreenStack, block: suspend () -> Unit) {
+        debugLogger.log("/$screenStack:${stateManager.currentScreenIdentifier(screenStack).URI}: an Event is called")
+        stateManager.runInScreenScope(screenStack) { block() }
     }
 
 }

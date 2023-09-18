@@ -3,6 +3,7 @@ package eu.baroncelli.dkmpsample.shared.viewmodel
 import eu.baroncelli.dkmpsample.shared.datalayer.Repository
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.CallOnInitValues
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenInitSettings
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.reflect.KClass
@@ -12,24 +13,36 @@ interface ScreenState
 
 class StateManager(repo: Repository) {
 
-    val screenStatesMap: MutableMap<URI, MutableStateFlow<ScreenState>> =
-        mutableMapOf() // map of screen states currently in memory
-    val screenScopesMap: MutableMap<URI, CoroutineScope> =
-        mutableMapOf() // map of coroutine scopes associated to current screen states
+    // for each ScreenStack a map of screen states currently in memory
+    val screenStackToScreenStatesMap: Map<ScreenStack, MutableMap<URI, MutableStateFlow<ScreenState>>> =
+        ScreenStack.entries.associateWith { mutableMapOf() }
 
-    val level1Backstack: MutableList<ScreenIdentifier> =
-        mutableListOf() // list elements are only NavigationLevel1 screenIdentifiers
-    val currentVerticalBackstack: MutableList<ScreenIdentifier> =
-        mutableListOf() // list elements are the screenIdentifiers of the current vertical backstack
-    val verticalNavigationLevels: MutableMap<URI, MutableMap<Int, ScreenIdentifier>> =
-        mutableMapOf() // the first map key is the NavigationLevel1 screenIdentifier URI, the second map key is the NavigationLevel numbers
+    // for each ScreenStack a map of coroutine scopes associated to current screen states
+    val screenStackToScreenScopesMap: Map<ScreenStack, MutableMap<URI, CoroutineScope>> =
+        ScreenStack.entries.associateWith { mutableMapOf() }
 
-    val currentScreenIdentifier: ScreenIdentifier
-        get() = currentVerticalBackstack.last()
-    val currentLevel1ScreenIdentifier: ScreenIdentifier?
-        get() = level1Backstack.lastOrNull()
-    val currentVerticalNavigationLevelsMap: MutableMap<Int, ScreenIdentifier>
-        get() = verticalNavigationLevels[currentLevel1ScreenIdentifier?.URI] ?: mutableMapOf()
+    // for each ScreenStack a list elements which are only NavigationLevel1 screenIdentifiers
+    val screenStackToLevel1Backstack: Map<ScreenStack, MutableList<ScreenIdentifier>> =
+        ScreenStack.entries.associateWith { mutableListOf() }
+
+    // list elements for each ScreenStack are the screenIdentifiers of the current vertical backstack
+    val screenStackToCurrentVerticalBackstack: Map<ScreenStack, MutableList<ScreenIdentifier>> =
+        ScreenStack.entries.associateWith { mutableListOf() }
+
+    // for each screen stack:
+    // the first map key is the NavigationLevel1 screenIdentifier URI, the second map key is the NavigationLevel numbers
+    val screenStackToVerticalNavigationLevels: Map<ScreenStack, MutableMap<URI, MutableMap<Int, ScreenIdentifier>>> =
+        ScreenStack.entries.associateWith { mutableMapOf() }
+
+    fun currentScreenIdentifier(screenStack: ScreenStack): ScreenIdentifier =
+        screenStackToCurrentVerticalBackstack[screenStack]!!.last()
+
+    fun currentLevel1ScreenIdentifier(screenStack: ScreenStack): ScreenIdentifier? =
+        screenStackToLevel1Backstack[screenStack]?.lastOrNull()
+
+    fun currentVerticalNavigationLevelsMap(screenStack: ScreenStack): MutableMap<Int, ScreenIdentifier> =
+        screenStackToVerticalNavigationLevels[screenStack]?.get(currentLevel1ScreenIdentifier(screenStack)?.URI)
+            ?: mutableMapOf()
 
     internal val dataRepository by lazy { repo }
     val events by lazy { Events(this) }
@@ -37,35 +50,37 @@ class StateManager(repo: Repository) {
 
     // INIT SCREEN
 
-    fun initScreen(screenIdentifier: ScreenIdentifier): Job? {
+    fun initScreen(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier): Job? {
         debugLogger.log("initScreen: " + screenIdentifier.URI)
         val screenInitSettings = screenIdentifier.getScreenInitSettings(this)
-        if (screenScopesMap[screenIdentifier.URI] == null || !screenScopesMap[screenIdentifier.URI]!!.isActive) {
-            screenScopesMap[screenIdentifier.URI]?.cancel()
-            screenScopesMap[screenIdentifier.URI] = CoroutineScope(Job() + Dispatchers.Main)
+        if (screenStackToScreenScopesMap[screenStack]?.get(screenIdentifier.URI) == null || !screenStackToScreenScopesMap[screenStack]!![screenIdentifier.URI]!!.isActive) {
+            screenStackToScreenScopesMap[screenStack]!![screenIdentifier.URI]?.cancel()
+            screenStackToScreenScopesMap[screenStack]!![screenIdentifier.URI] = CoroutineScope(Job() + Dispatchers.Main)
         }
         var firstInit = false
-        if (!isInTheStatesMap(screenIdentifier)) {
+        if (!isInTheStatesMap(screenStack, screenIdentifier)) {
             firstInit = true
-            screenStatesMap[screenIdentifier.URI] = MutableStateFlow(screenInitSettings.initState(screenIdentifier))
+            screenStackToScreenStatesMap[screenStack]!![screenIdentifier.URI] =
+                MutableStateFlow(screenInitSettings.initState(screenIdentifier))
         } else if (screenInitSettings.callOnInitAtEachNavigation == CallOnInitValues.DONT_CALL) {
             return null  // in case: the state is already in the map
             //          AND "callOnInitAtEachNavigation" is set to DONT_CALL
             //      => we don't need to run the "callOnInit" function
         }
-        return runCallOnInit(screenIdentifier, screenInitSettings, firstInit)
+        return runCallOnInit(screenStack, screenIdentifier, screenInitSettings, firstInit)
     }
 
-    fun isInTheStatesMap(screenIdentifier: ScreenIdentifier): Boolean {
-        return screenStatesMap.containsKey(screenIdentifier.URI)
+    fun isInTheStatesMap(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier): Boolean {
+        return screenStackToScreenStatesMap[screenStack]!!.containsKey(screenIdentifier.URI)
     }
 
     fun runCallOnInit(
+        screenStack: ScreenStack,
         screenIdentifier: ScreenIdentifier,
         screenInitSettings: ScreenInitSettings,
         firstInit: Boolean = false
     ): Job? {
-        return runInScreenScope(screenIdentifier) {
+        return runInScreenScope(screenStack, screenIdentifier) {
             screenInitSettings.callOnInit(this@StateManager)
         }
     }
@@ -74,6 +89,7 @@ class StateManager(repo: Repository) {
     // UPDATE SCREEN
 
     inline fun <reified T : ScreenState> updateScreen(
+        screenStack: ScreenStack,
         @Suppress("UNUSED_PARAMETER") stateClass: KClass<T>,
         update: (T) -> T,
     ) {
@@ -82,11 +98,12 @@ class StateManager(repo: Repository) {
 
         lateinit var screenIdentifier: ScreenIdentifier
         var screenState: T?
-        for (i in currentVerticalNavigationLevelsMap.keys.sortedDescending()) {
-            screenState = screenStatesMap[currentVerticalNavigationLevelsMap[i]?.URI]?.value as? T
+        for (i in currentVerticalNavigationLevelsMap(screenStack).keys.sortedDescending()) {
+            screenState =
+                screenStackToScreenStatesMap[screenStack]!![currentVerticalNavigationLevelsMap(screenStack)[i]?.URI]?.value as? T
             if (screenState != null) {
-                screenIdentifier = currentVerticalNavigationLevelsMap[i]!!
-                screenStatesMap[screenIdentifier.URI]!!.value = update(screenState)
+                screenIdentifier = currentVerticalNavigationLevelsMap(screenStack)[i]!!
+                screenStackToScreenStatesMap[screenStack]!![screenIdentifier.URI]!!.value = update(screenState)
                 debugLogger.log("state updated @ /${screenIdentifier.URI}")
                 return
             }
@@ -96,41 +113,51 @@ class StateManager(repo: Repository) {
 
     // REMOVE SCREEN
 
-    fun removeScreen(screenIdentifier: ScreenIdentifier) {
+    fun removeScreen(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier) {
         debugLogger.log("removeScreen: " + screenIdentifier.URI + " / level " + screenIdentifier.screen.navigationLevel)
-        screenScopesMap[screenIdentifier.URI]?.cancel() // cancel screen's coroutine scope
-        screenScopesMap.remove(screenIdentifier.URI)
+        screenStackToScreenScopesMap[screenStack]!![screenIdentifier.URI]?.cancel() // cancel screen's coroutine scope
+        screenStackToScreenScopesMap[screenStack]!!.remove(screenIdentifier.URI)
         val screenInitSettings = screenIdentifier.getScreenInitSettings(this)
         if (screenInitSettings.clearStateCacheWhenScreenIsRemovedFromBackstack) {
             debugLogger.log("removeState " + screenIdentifier.URI)
-            screenStatesMap.remove(screenIdentifier.URI)
+            screenStackToScreenStatesMap[screenStack]!!.remove(screenIdentifier.URI)
         }
     }
 
 
     // COROUTINE SCOPES FUNCTIONS
 
-    fun reinitScreenScopes(): List<ScreenIdentifier> {
-        currentVerticalNavigationLevelsMap.forEach {
-            //debugLogger.log("reinitScreenScopes() "+it.value.URI)
-            screenScopesMap[it.value.URI] = CoroutineScope(Job() + Dispatchers.Main)
+    fun reinitScreenScopes(): Map<ScreenStack, List<ScreenIdentifier>> {
+        return ScreenStack.entries.associateWith { screenStack ->
+            currentVerticalNavigationLevelsMap(screenStack).forEach {
+                //debugLogger.log("reinitScreenScopes() "+it.value.URI)
+                screenStackToScreenScopesMap[screenStack]!![it.value.URI] = CoroutineScope(Job() + Dispatchers.Main)
+            }
+            currentVerticalNavigationLevelsMap(screenStack).values.toMutableList() // return list of screens whose scope has been reinitialized
         }
-        return currentVerticalNavigationLevelsMap.values.toMutableList() // return list of screens whose scope has been reinitialized
     }
 
     // we run each event function on a Dispatchers.Main coroutine
-    fun runInScreenScope(screenIdentifier: ScreenIdentifier? = null, block: suspend () -> Unit): Job? {
-        val URI = screenIdentifier?.URI ?: currentScreenIdentifier.URI
-        val screenScope = screenScopesMap[URI]
+    fun runInScreenScope(
+        screenStack: ScreenStack,
+        screenIdentifier: ScreenIdentifier? = null,
+        block: suspend () -> Unit
+    ): Job? {
+        val URI = screenIdentifier?.URI ?: currentScreenIdentifier(screenStack).URI
+        val screenScope = screenStackToScreenScopesMap[screenStack]!![URI]
         return screenScope?.launch {
             block()
         }
     }
 
     fun cancelScreenScopes() {
-        screenScopesMap.forEach {
+        screenStackToScreenScopesMap.flatMap { (screenStack, uriToScope) ->
+            uriToScope.map { (uri, scope) ->
+                Pair(Pair(screenStack, uri), scope)
+            }
+        }.toMap().forEach { (screenStackAndUri, scope) ->
             //debugLogger.log("cancelScreenScopes() "+it.key)
-            it.value.cancel() // cancel screen's coroutine scope
+            scope.cancel() // cancel screen's coroutine scope
         }
     }
 

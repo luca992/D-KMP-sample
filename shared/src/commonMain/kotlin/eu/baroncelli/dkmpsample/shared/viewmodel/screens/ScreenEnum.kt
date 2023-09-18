@@ -4,6 +4,7 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
 import eu.baroncelli.dkmpsample.shared.viewmodel.StateManager
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrieslist.initCountriesList
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.countrydetail.initCountryDetail
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.topbar.initTopBar
 
 
 // DEFINITION OF ALL SCREENS IN THE APP
@@ -13,6 +14,7 @@ enum class Screen(
     val navigationLevel: Int = 1,
     val initSettings: StateManager.(ScreenIdentifier) -> ScreenInitSettings,
 ) {
+    TopBar("topbar", 1, { initTopBar() }),
     CountriesList("countrieslist", 1, { initCountriesList(it.params()) }),
     CountryDetail("country", 2, { initCountryDetail(it.params()) })
 }
