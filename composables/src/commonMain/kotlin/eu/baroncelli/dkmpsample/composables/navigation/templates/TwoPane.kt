@@ -31,7 +31,7 @@ fun Navigation.TwoPane(
                     ScreenStack.TopBar,
                     topBarStackScreenIdentifier,
                 ) {
-                    onBackPressed(saveableStateHolder, screenStackToLocalNavigationState)
+                    onBackPressed(saveableStateHolder)
                 }
             }
         },

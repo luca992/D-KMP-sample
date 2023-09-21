@@ -11,10 +11,6 @@ import eu.baroncelli.dkmpsample.composables.navigation.templates.OnePane
 import eu.baroncelli.dkmpsample.composables.navigation.templates.TwoPane
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
-import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Level1Navigation
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Screen
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenParams
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 @Composable
@@ -33,6 +29,6 @@ fun Navigation.Router() {
         }
     }
 
-    HandleBackButton(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
+    HandleBackButton(screenUIsStateHolder)
 
 }
