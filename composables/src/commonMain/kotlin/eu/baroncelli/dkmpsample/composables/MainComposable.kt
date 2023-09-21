@@ -6,7 +6,7 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.DKMPViewModel
 
 @Composable
 fun MainComposable(model: DKMPViewModel) {
-    val dkmpNav = model.navigation
+    val dkmpNav = model.stateManager.navigation
     dkmpNav.Router()
 }
 

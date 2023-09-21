@@ -13,6 +13,8 @@ interface ScreenState
 
 class StateManager(repo: Repository) {
 
+    val navigation by lazy { Navigation(this) }
+
     // for each ScreenStack a map of screen states currently in memory
     val screenStackToScreenStatesMap: Map<ScreenStack, MutableMap<URI, MutableStateFlow<ScreenState>>> =
         ScreenStack.entries.associateWith { mutableMapOf() }

@@ -27,10 +27,10 @@ class AppLifecycleObserver(private val model: DKMPViewModel) : LifecycleEventObs
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             Lifecycle.Event.ON_START ->
-                model.navigation.onReEnterForeground()
+                model.stateManager.navigation.onReEnterForeground()
 
             Lifecycle.Event.ON_STOP ->
-                model.navigation.onEnterBackground()
+                model.stateManager.navigation.onEnterBackground()
 
             else ->
                 return
