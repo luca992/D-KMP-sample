@@ -23,7 +23,7 @@ class Navigation(val stateManager: StateManager) {
 
     val stateProvider by lazy { StateProvider(stateManager) }
 
-    val screenStackToNavigationState: MutableMap<ScreenStack, NavigationState> = getStartNavigationStates()
+    var screenStackToNavigationState: MutableMap<ScreenStack, NavigationState> = getStartNavigationStates()
 
     init {
         // todo: maybe just set screenStackToNavigationState to an empty map instead of using getStartNavigationStates()

@@ -29,7 +29,6 @@ fun Navigation.ScreenPicker(
     screenStackToLocalNavigationState: SnapshotStateMap<ScreenStack, NavigationState>,
     onBackPressed: (() -> Unit)? = null
 ) {
-    val navigate = navigationProcessor(screenStack, screenStackToLocalNavigationState)
     when (screenIdentifier.screen) {
 
         TopBar -> {
@@ -43,7 +42,12 @@ fun Navigation.ScreenPicker(
             val state by stateProvider.get<CountriesListState>(screenStack, screenIdentifier).collectAsState()
             CountriesListScreen(
                 countriesListState = state,
-                onListItemClick = { navigate(CountryDetail, CountryDetailParams(countryName = it)) },
+                onListItemClick = {
+                    navigateToScreen(
+                        ScreenStack.Main,
+                        ScreenIdentifier.get(CountryDetail, CountryDetailParams(countryName = it))
+                    )
+                },
                 onFavoriteIconClick = { stateManager.events.selectFavorite(countryName = it) },
             )
         }

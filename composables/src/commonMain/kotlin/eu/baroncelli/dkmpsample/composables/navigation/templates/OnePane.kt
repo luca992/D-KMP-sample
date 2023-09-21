@@ -6,7 +6,6 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import eu.baroncelli.dkmpsample.composables.navigation.ScreenPicker
 import eu.baroncelli.dkmpsample.composables.navigation.bars.Level1BottomBar
-import eu.baroncelli.dkmpsample.composables.navigation.level1NavigationProcessor
 import eu.baroncelli.dkmpsample.composables.navigation.onBackPressed
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
@@ -37,10 +36,7 @@ fun Navigation.OnePane(
             }
         },
         bottomBar = {
-            if (mainStackScreenIdentifier.screen.navigationLevel == 1) Level1BottomBar(
-                mainStackScreenIdentifier,
-                level1NavigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
-            )
+            if (mainStackScreenIdentifier.screen.navigationLevel == 1) Level1BottomBar(mainStackScreenIdentifier)
         }
     )
 }

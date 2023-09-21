@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import eu.baroncelli.dkmpsample.composables.navigation.ScreenPicker
 import eu.baroncelli.dkmpsample.composables.navigation.TwoPaneDefaultDetail
 import eu.baroncelli.dkmpsample.composables.navigation.bars.Level1NavigationRail
-import eu.baroncelli.dkmpsample.composables.navigation.level1NavigationProcessor
 import eu.baroncelli.dkmpsample.composables.navigation.onBackPressed
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
@@ -44,10 +43,7 @@ fun Navigation.TwoPane(
                         .fillMaxHeight()
                         .width(80.dp)
                 ) {
-                    Level1NavigationRail(
-                        masterScreenIdentifier,
-                        level1NavigationProcessor(ScreenStack.Main, screenStackToLocalNavigationState)
-                    )
+                    Level1NavigationRail(masterScreenIdentifier)
                 }
                 Column(
                     Modifier

@@ -21,39 +21,18 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 fun Navigation.Router() {
 
     val screenUIsStateHolder = rememberSaveableStateHolder()
-    val screenStackToLocalNavigationState =
+    screenStackToNavigationState =
         remember { mutableStateMapOf(*screenStackToNavigationState.entries.map { it.toPair() }.toTypedArray()) }
 
     val twopaneWidthThreshold = 1000.dp
     BoxWithConstraints {
         if (maxWidth < maxHeight || maxWidth < twopaneWidthThreshold) {
-            OnePane(screenUIsStateHolder, screenStackToLocalNavigationState)
+            OnePane(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
         } else {
-            TwoPane(screenUIsStateHolder, screenStackToLocalNavigationState)
+            TwoPane(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
         }
     }
 
-    HandleBackButton(screenUIsStateHolder, screenStackToLocalNavigationState)
+    HandleBackButton(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
 
-}
-
-fun Navigation.navigationProcessor(
-    screenStack: ScreenStack,
-    localNavigationState: SnapshotStateMap<ScreenStack, NavigationState>
-): (Screen, ScreenParams?) -> Unit {
-    return { screen, screenParams ->
-        val screenIdentifier = ScreenIdentifier.get(screen, screenParams)
-        navigateToScreen(screenStack, screenIdentifier) // shared navigationState is updated
-        localNavigationState[screenStack] = screenStackToNavigationState[screenStack]!! // update localNavigationState
-    }
-}
-
-fun Navigation.level1NavigationProcessor(
-    screenStack: ScreenStack,
-    localNavigationState: SnapshotStateMap<ScreenStack, NavigationState>
-): (Level1Navigation) -> Unit {
-    return {
-        selectLevel1Navigation(screenStack, it.screenIdentifier) // shared navigationState is updated
-        localNavigationState[screenStack] = screenStackToNavigationState[screenStack]!! // update localNavigationState
-    }
 }

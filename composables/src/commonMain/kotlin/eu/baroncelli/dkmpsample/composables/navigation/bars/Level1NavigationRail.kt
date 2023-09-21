@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Level1Navigation
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 
 // this is the left vertical navigation bar for 2-Pane visualization
@@ -27,7 +28,6 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Level1Navigation
 @Composable
 fun Navigation.Level1NavigationRail(
     selectedTab: ScreenIdentifier,
-    navigateByLevel1Menu: (Level1Navigation) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -40,13 +40,13 @@ fun Navigation.Level1NavigationRail(
             icon = { Icon(Icons.Default.Menu, "ALL") },
             label = { Text("All Countries", fontSize = 13.sp) },
             selected = selectedTab.URI == Level1Navigation.AllCountries.screenIdentifier.URI,
-            onClick = { navigateByLevel1Menu(Level1Navigation.AllCountries) }
+            onClick = { selectLevel1Navigation(ScreenStack.Main, Level1Navigation.AllCountries.screenIdentifier) }
         )
         NavigationRailItem(
             icon = { Icon(Icons.Default.Star, "FAVORITES") },
             label = { Text("Favourites", fontSize = 13.sp) },
             selected = selectedTab.URI == Level1Navigation.FavoriteCountries.screenIdentifier.URI,
-            onClick = { navigateByLevel1Menu(Level1Navigation.FavoriteCountries) }
+            onClick = { selectLevel1Navigation(ScreenStack.Main, Level1Navigation.FavoriteCountries.screenIdentifier) }
         )
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.sp
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
 import eu.baroncelli.dkmpsample.shared.viewmodel.ScreenIdentifier
 import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Level1Navigation
+import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 
 // this is the bottom horizontal navigation bar for 1-Pane visualization
@@ -20,20 +21,19 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.Level1Navigation
 @Composable
 fun Navigation.Level1BottomBar(
     selectedTab: ScreenIdentifier,
-    navigateByLevel1Menu: (Level1Navigation) -> Unit
 ) {
     BottomAppBar(content = {
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Menu, "ALL") },
             label = { Text("All Countries", fontSize = 13.sp) },
             selected = selectedTab.URI == Level1Navigation.AllCountries.screenIdentifier.URI,
-            onClick = { navigateByLevel1Menu(Level1Navigation.AllCountries) }
+            onClick = { selectLevel1Navigation(ScreenStack.Main, Level1Navigation.AllCountries.screenIdentifier) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Star, "FAVORITES") },
             label = { Text("Favourites", fontSize = 13.sp) },
             selected = selectedTab.URI == Level1Navigation.FavoriteCountries.screenIdentifier.URI,
-            onClick = { navigateByLevel1Menu(Level1Navigation.FavoriteCountries) }
+            onClick = { selectLevel1Navigation(ScreenStack.Main, Level1Navigation.FavoriteCountries.screenIdentifier) }
         )
     })
 }
