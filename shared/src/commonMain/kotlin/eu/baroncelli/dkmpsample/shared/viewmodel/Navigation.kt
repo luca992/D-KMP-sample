@@ -33,8 +33,9 @@ class Navigation(val stateManager: StateManager) {
         }
     }
 
-    val nextBackQuitsApp: Boolean
-        get() = stateManager.screenStackToLevel1Backstack.size + stateManager.screenStackToCurrentVerticalBackstack.size == 2
+    fun nextBackQuitsApp(screenStack: ScreenStack): Boolean =
+        stateManager.screenStackToLevel1Backstack[screenStack]!!.size +
+                stateManager.screenStackToCurrentVerticalBackstack[screenStack]!!.size == 2
 
     private fun savedLevel1URI(screenStack: ScreenStack) =
         stateManager.dataRepository.localSettings.getSavedScreenStackLevel1URI(screenStack)
@@ -49,7 +50,7 @@ class Navigation(val stateManager: StateManager) {
             NavigationState(
                 screenIdentifier,
                 mutableMapOf(screenIdentifier.URI to mutableListOf()),
-                nextBackQuitsApp
+                nextBackQuitsApp(screenStack)
             )
         }.toMutableMap()
     }
@@ -76,7 +77,7 @@ class Navigation(val stateManager: StateManager) {
         screenStackToNavigationState[screenStack] = NavigationState(
             currentLevel1ScreenIdentifier = stateManager.currentLevel1ScreenIdentifier(screenStack)!!,
             paths = getPaths(screenStack),
-            nextBackQuitsApp = nextBackQuitsApp
+            nextBackQuitsApp = nextBackQuitsApp(screenStack)
         )
         val topScreenIdentifier = screenStackToNavigationState[screenStack]!!.topScreenIdentifier
         if (navigationSettings.saveLastLevel1Screen &&
@@ -198,7 +199,9 @@ class Navigation(val stateManager: StateManager) {
     // only if the screenIdentifier to exit is valid
     fun exitScreenForIos(screenStack: ScreenStack, screenIdentifier: ScreenIdentifier) {
         //debugLogger.i("exitScreenForIos: " + screenIdentifier.URI)
-        if (screenIdentifier.URI != stateManager.currentScreenIdentifier(screenStack).URI || nextBackQuitsApp) {
+        if (screenIdentifier.URI != stateManager.currentScreenIdentifier(screenStack).URI ||
+            nextBackQuitsApp(screenStack)
+        ) {
             return
         }
         exitScreen(screenStack, screenIdentifier)
