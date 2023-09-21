@@ -19,7 +19,6 @@ fun Navigation.onBackPressed(
 ) {
     val navState = localNavigationState[ScreenStack.Main]!!
     val originScreenIdentifier = navState.topScreenIdentifier
-    exitScreen(ScreenStack.Main, originScreenIdentifier) // shared navigationState is updated
-    localNavigationState[ScreenStack.Main] = screenStackToNavigationState[ScreenStack.Main]!! // update localNavigationState
+    exitScreen(ScreenStack.Main, originScreenIdentifier)
     saveableStateHolder.removeState(originScreenIdentifier)
 }

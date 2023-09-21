@@ -23,8 +23,7 @@ fun Navigation.OnePane(
             saveableStateHolder.SaveableStateProvider(topBarStackScreenIdentifier.URI) {
                 ScreenPicker(
                     ScreenStack.TopBar,
-                    topBarStackScreenIdentifier,
-                    screenStackToLocalNavigationState
+                    topBarStackScreenIdentifier
                 ) {
                     onBackPressed(saveableStateHolder, screenStackToLocalNavigationState)
                 }
@@ -32,7 +31,7 @@ fun Navigation.OnePane(
         },
         content = {
             saveableStateHolder.SaveableStateProvider(mainStackScreenIdentifier.URI) {
-                ScreenPicker(ScreenStack.Main, mainStackScreenIdentifier, screenStackToLocalNavigationState)
+                ScreenPicker(ScreenStack.Main, mainStackScreenIdentifier)
             }
         },
         bottomBar = {

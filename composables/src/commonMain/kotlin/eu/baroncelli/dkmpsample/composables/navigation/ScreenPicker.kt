@@ -26,7 +26,6 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.topbar.TopBarState
 fun Navigation.ScreenPicker(
     screenStack: ScreenStack,
     screenIdentifier: ScreenIdentifier,
-    screenStackToLocalNavigationState: SnapshotStateMap<ScreenStack, NavigationState>,
     onBackPressed: (() -> Unit)? = null
 ) {
     when (screenIdentifier.screen) {

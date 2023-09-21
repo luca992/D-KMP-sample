@@ -30,7 +30,6 @@ fun Navigation.TwoPane(
                 ScreenPicker(
                     ScreenStack.TopBar,
                     topBarStackScreenIdentifier,
-                    screenStackToLocalNavigationState
                 ) {
                     onBackPressed(saveableStateHolder, screenStackToLocalNavigationState)
                 }
@@ -53,7 +52,6 @@ fun Navigation.TwoPane(
                         ScreenPicker(
                             ScreenStack.Main,
                             masterScreenIdentifier,
-                            screenStackToLocalNavigationState
                         )
                     }
                 }
@@ -69,7 +67,6 @@ fun Navigation.TwoPane(
                             ScreenPicker(
                                 ScreenStack.Main,
                                 detailScreenIdentifier,
-                                screenStackToLocalNavigationState
                             )
                         }
                     }
