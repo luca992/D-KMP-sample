@@ -14,10 +14,9 @@ import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 @Composable
 fun Navigation.OnePane(
     saveableStateHolder: SaveableStateHolder,
-    screenStackToLocalNavigationState: SnapshotStateMap<ScreenStack, NavigationState>
 ) {
-    val mainStackScreenIdentifier = screenStackToLocalNavigationState[ScreenStack.Main]!!.topScreenIdentifier
-    val topBarStackScreenIdentifier = screenStackToLocalNavigationState[ScreenStack.TopBar]!!.topScreenIdentifier
+    val mainStackScreenIdentifier = screenStackToNavigationState[ScreenStack.Main]!!.topScreenIdentifier
+    val topBarStackScreenIdentifier = screenStackToNavigationState[ScreenStack.TopBar]!!.topScreenIdentifier
     Scaffold(
         topBar = {
             saveableStateHolder.SaveableStateProvider(topBarStackScreenIdentifier.URI) {

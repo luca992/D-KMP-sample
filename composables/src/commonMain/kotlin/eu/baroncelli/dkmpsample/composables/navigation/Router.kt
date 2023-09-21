@@ -5,13 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.unit.dp
 import eu.baroncelli.dkmpsample.composables.navigation.templates.OnePane
 import eu.baroncelli.dkmpsample.composables.navigation.templates.TwoPane
 import eu.baroncelli.dkmpsample.shared.viewmodel.Navigation
-import eu.baroncelli.dkmpsample.shared.viewmodel.NavigationState
-import eu.baroncelli.dkmpsample.shared.viewmodel.screens.ScreenStack
 
 @Composable
 fun Navigation.Router() {
@@ -23,9 +20,9 @@ fun Navigation.Router() {
     val twopaneWidthThreshold = 1000.dp
     BoxWithConstraints {
         if (maxWidth < maxHeight || maxWidth < twopaneWidthThreshold) {
-            OnePane(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
+            OnePane(screenUIsStateHolder)
         } else {
-            TwoPane(screenUIsStateHolder, screenStackToNavigationState as SnapshotStateMap<ScreenStack, NavigationState>)
+            TwoPane(screenUIsStateHolder)
         }
     }
 
