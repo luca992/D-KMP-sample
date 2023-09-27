@@ -21,8 +21,7 @@ class MySettings(private val s: Settings) {
     )
 
     fun setSavedScreenStackLevel1URI(screenStack: ScreenStack, uri: URI) {
-        s["saved${screenStack}ScreenStackLevel1URI"] =
-            navigationSettings.screenStackDefaultStartScreen(screenStack).screenIdentifier.URI
+        s["saved${screenStack}ScreenStackLevel1URI"] = uri
     }
 
 
