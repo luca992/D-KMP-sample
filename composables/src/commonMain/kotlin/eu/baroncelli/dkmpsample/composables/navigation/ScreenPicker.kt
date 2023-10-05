@@ -28,24 +28,21 @@ fun Navigation.ScreenPicker(
 
     when (screenIdentifier.screen) {
 
-        CountriesList -> {
+        CountriesList ->
             CountriesListScreen(
                 countriesListState = state as CountriesListState,
                 onListItemClick = { navigate(CountryDetail, CountryDetailParams(countryName = it)) },
                 onFavoriteIconClick = { events.selectFavorite(countryName = it) },
             )
-        }
 
-        CountryDetail -> {
+        CountryDetail ->
             CountryDetailScreen(
                 countryDetailState = state as CountryDetailState
             )
-        }
 
     }
 
 }
-
 
 
 @Composable
@@ -58,7 +55,7 @@ fun Navigation.TwoPaneDefaultDetail(
         CountriesList ->
             CountriesListTwoPaneDefaultDetail()
 
-        else -> Box{}
+        else -> Box {}
     }
 
 }
